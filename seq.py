@@ -13,14 +13,14 @@ class DNASequence:
 
     def getId(self):
         return self.__id
-
     def setId(self, id):
-        if len(id) == 0 :
-            raise ValueError("ID cant be empty!")
-        if id in DNASequence.DNA_SEQUENCES.ids:
-            raise ValueError("")
+     if len(id) == 0:
+        raise ValueError("ID cant be empty")
 
-        DNASequence._settingID(self, id)
+     if id in DNASequence.ids:
+        raise ValueError("ID already exists")
+
+     DNASequence._settingID(self, id)
 
     def _settingID(self, id):
         if id not in DNASequence.ids:
@@ -31,6 +31,7 @@ class DNASequence:
         return self.__seq
 
     def setSeq(self, seq):
+        seq = seq.upper()
         validChars = ["A", "C", "G", "T"]
         if len(seq) == 0:
             raise ValueError("Seq cant be empty!")
@@ -61,14 +62,16 @@ class DNASequence:
 
 def makeNewDNA():
     dna = DNASequence()
-    id = input("Enter your ID: ")
-    DNASequence.setId(dna, id)
-    seq = input("Enter your DNA sequence: ")
-    DNASequence.setSeq(dna, seq)
-
-    return dna
-
-
+    try:
+        id = input("Enter your ID: ")
+        DNASequence.setId(dna, id)
+        seq = input("Enter your DNA sequence: ")
+        DNASequence.setSeq(dna, seq)
+        return dna
+    except ValueError as e:
+        if dna.getId() != "":
+            DNASequence.ids.remove(dna.getId())
+        print(e)
 def findId(sequence):
     all_ids = []
     for id, seq in DNASequence.DNA_SEQUENCES.items():
@@ -82,15 +85,34 @@ def findSeq(identification):
             return seq
 
 def getGCpercentage(id):
-    print("in progress...")
-    ...
+    if id not in DNASequence.DNA_SEQUENCES:
+        return None
+    seq = DNASequence.DNA_SEQUENCES[id]
+    g = seq.count("G")
+    c = seq.count("C")
+
+    return (g + c) / len(seq) * 100
 
 
 def reverseComplement(id):
-    print("in progress...")
-    ...
+    if id not in DNASequence.DNA_SEQUENCES:
+        return None
+    seq = DNASequence.DNA_SEQUENCES[id]
+    complement = {"A": "T", "T": "A", "C": "G", "G": "C"}
+    result = ""
+    for char in seq[::-1]:
+        result += complement[char]
+    return result
 
 def findPattern(id, pattern):
-    print("in progress...")
-    ...
-
+    if id not in DNASequence.DNA_SEQUENCES:
+        return None
+    seq = DNASequence.DNA_SEQUENCES[id]
+    positions = []
+    pattern = pattern.upper()
+    if pattern == "":
+        return positions
+    for i in range(len(seq) - len(pattern) + 1):
+        if seq[i:i + len(pattern)] == pattern:
+            positions.append(i)
+    return positions
